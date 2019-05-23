@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Module Develop</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <style type="text/css">
+        html, body {
+            height: 100%
+        }
+
+        body {
+            background-color: #fff;
+            margin: 0;
+        }
+
+        #wrap {
+            height: 100%;
+            position: relative;
+        }
+
+        #header {
+            background-color: #5082c2;
+            height: 44px;
+            position: relative;
+        }
+
+        #header h1 {
+            font-size: 20px;
+            height: 44px;
+            line-height: 44px;
+            margin: 0em;
+            color: #fff;
+            margin-left: 100px;
+            margin-right: 100px;
+            text-align: center;
+        }
+
+        #main {
+            display: block;
+        }
+
+        a.button {
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            height: 36px;
+            margin: 8px;
+            background-color: rgba(240, 240, 240, 1.0);
+            border-color: rgba(220, 220, 220, 1.0);
+            border-width: 2px;
+            border-style: solid;
+        }
+
+        a.active {
+            background-color: rgba(240, 240, 240, 0.6);
+        }
+
+        .input {
+            width: 100%;
+        }
+
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/aui.2.0.css"/>
+</head>
+<body>
+<div id="wrap">
+    <div id="main">
+        <div style="margin:8px ">
+            <input placeholder="websocket url" id="url" class="input"
+                   value="wss://t-api.ezhiduo.cn:8282?auth_key=qEfQAyuW-1558594124-d25b282f511733db0e50b93d0f1dab1c0&module_test=1"/>
+            <label for="autoReconnect"><input id="autoReconnect" type="checkbox" onchange="setAutoReconnect(this)"  />开启自动重连</label>
+            <button class="button" tapmode="active" onclick="openSocket()" id="openSocket">连接</button>
+        </div>
+        <div style="padding:8px ">
+            <div>开启自动重连后，网络变化、后台进入前台</div>
+            <div>将自动判断进行重连</div>
+        </div>
+        <div style="padding:8px ">
+            <input placeholder="websocket url" id="msg" class="input" style="width: 70%" value="test msg"></input>
+            <button  tapmode="active" onclick="sendSocket()" id="sendSocket">发送消息</button>
+        </div>
+        <div style="padding:8px ">
+            <button tapmode="active" onclick="closeSocket()" id="closeSocket">关闭</button>
+            <button class="" tapmode="active" onclick="api.openWin({ name: 'websocket2',url:'widget://html/websocket2.html'})" >打开 websocket2</button>
+        </div>
+    </div>
+
+    消息状态：
+    <button onclick="document.getElementById('TestDiv').innerHTML='';content='';">清除</button>
+    <div id="TestDiv">
+    </div>
+
+</div>
+<script>
+
+    var isAutoReconnect = false;
+    var webSocket = null;
+    var content = "";
+
+
+    function setAutoReconnect(obj){
+        isAutoReconnect = obj.checked
+    }
+    function toast(msg) {
+        api.toast({msg: msg});
+    }
+
+
+
+
+
+
+    function openSocket() {
+
+        var url = document.getElementById('url').value;
+        document.getElementById('openSocket').setAttribute('disabled', true);
+        webSocket.open({url: url, pingInterval: 30, pingData: "ping",autoReconnect:isAutoReconnect}, function (ret, err) {
+            if (err) {
+                toast("打开失败。。。");
+            } else {
+                toast("打开成功。。。")
+            }
+        });
+
+        //注意只可以绑定一次哦，后面添加的会覆盖哦。
+        webSocket.bindEvent(function (ret, err) {
+            var type = ret.type;
+            var data = ret.data;
+
+            switch (type) {
+                case 'opened':
+                    document.getElementById('openSocket').setAttribute('disabled', true);
+                    break;
+                case 'receive':
+                    break;
+                case 'closed':
+                    document.getElementById('openSocket').removeAttribute('disabled');
+                    break;
+            }
+
+            content += "type:" + type + ",data:" + data + "</br>" + new Date();
+            document.getElementById("TestDiv").innerHTML = content;
+        })
+
+    }
+
+    function sendSocket() {
+        if (!webSocket) {
+            toast('请先连接');
+            return;
+        }
+        var msg = document.getElementById('msg').value;
+        var data = {
+            type:'test-msg',
+            message:msg
+        }
+        var r = webSocket.send({msg: data});
+        if (r != 'success') toast('发送失败');
+        else toast('发送成功');
+
+    }
+
+    function closeSocket() {
+
+        webSocket.close(function (ret, err) {
+            toast(ret.data || err.data);
+            document.getElementById('openSocket').removeAttribute('disabled');
+        });
+
+
+    }
+
+    function apiready() {
+
+        // 导入模块
+        webSocket = api.require('myWebSocket');
+
+    }
+
+</script>
+</body>
+
+</html>
+

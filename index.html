@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>mywebsocket</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="css/aui.2.0.css">
+</head>
+<body>
+<div id="wrap">
+    <header class="aui-bar aui-bar-nav" id="header" style="padding-top: 20px"><h1 id="title">模块开发</h1></header>
+
+    <footer class="aui-bar aui-bar-tab" id="footer">
+        <div class="aui-bar-tab-item  aui-active" tapmode onclick="switchFrame(0)">
+            <div class="aui-bar-tab-label">WebSocket</div>
+        </div>
+        <div class="aui-bar-tab-item" tapmode onclick="switchFrame(1)">
+            <div class="aui-bar-tab-label">WebSocket 2</div>
+        </div>
+    </footer>
+
+</div>
+</body>
+<script src="script/api.js"></script>
+<script type="text/javascript">
+    function apiready() {
+
+        initFarmeGrounp();
+
+        switchFrame(0);
+    }
+
+    var currentTab =0;
+
+    function initFarmeGrounp(){
+        var footer_h = $api.offset($api.byId("footer")).h;
+        var header_h = $api.offset($api.byId("header")).h;
+        //打开frame 组
+        api.openFrameGroup({
+            name : "index",
+            scrollEnabled: false,
+            background : "#e3e3e3",
+            rect : {
+                x : 0,
+                y : header_h,
+                w : api.winWidth,
+                h : api.winHeight - footer_h - header_h -1
+            },
+            index : 0,
+            preload:3,
+            frames : [{
+                name : "page1",
+                url : "html/websocket.html",
+                bounces: false,
+                vScrollBarEnabled: false,
+                hScrollBarEnabled: false,
+            },{
+                name : "page2",
+                url : "html/websocket2.html",
+                bounces: false,
+                vScrollBarEnabled: false,
+                hScrollBarEnabled: false,
+            }]
+        },function(ret){
+
+        });
+
+    }
+
+    //底部选项卡切换
+    function switchFrame(index){
+        if(index == currentTab){
+            return;
+        }
+
+        currentTab = index;
+
+
+
+        api.setFrameGroupIndex({
+            name: 'index',
+            index: index,
+        });
+
+        var footer_items  = $api.domAll(".aui-bar-tab-item");
+
+        for(var i=0;i < footer_items.length;i++){
+            if(i != index){
+                $api.removeCls(footer_items[i],"aui-active");
+            }else{
+                $api.addCls(footer_items[i],"aui-active");
+                currentTab = i;
+            }
+        }
+
+    }
+</script>
+</html>
+
