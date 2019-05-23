@@ -155,7 +155,7 @@
             type:'test-msg',
             message:msg
         }
-        var r = webSocket.send({msg: data});
+        var r = webSocket.send({msg: JSON.stringify(data)});
         if (r != 'success') toast('发送失败');
         else toast('发送成功');
 
@@ -164,7 +164,9 @@
     function closeSocket() {
 
         webSocket.close(function (ret, err) {
-            toast(ret.data || err.data);
+            if(ret)
+            toast(ret.data);
+            else toast(err.data)
             document.getElementById('openSocket').removeAttribute('disabled');
         });
 
