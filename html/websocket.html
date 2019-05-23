@@ -82,6 +82,7 @@
             <button  tapmode="active" onclick="sendSocket()" id="sendSocket">发送消息</button>
         </div>
         <div style="padding:8px ">
+            <button tapmode="active" onclick="alert(webSocket.readyState())" >readyState</button>
             <button tapmode="active" onclick="closeSocket()" id="closeSocket">关闭</button>
             <button class="" tapmode="active" onclick="api.openWin({ name: 'websocket2',url:'widget://html/websocket2.html'})" >打开 websocket2</button>
         </div>
@@ -140,7 +141,7 @@
                     break;
             }
 
-            content += "type:" + type + ",data:" + data + "</br>" + new Date();
+            content += "type:" + type + ",data:" + data + new Date().toLocaleTimeString()+ "</br>" ;
             document.getElementById("TestDiv").innerHTML = content;
         })
 
